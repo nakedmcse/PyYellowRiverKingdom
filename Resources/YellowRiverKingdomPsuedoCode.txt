@@ -1,0 +1,125 @@
+//
+//  This is the psuedo code for the original Yellow River Kingdom Program
+//
+//If there is an error, print it and end the program
+
+Call Variable
+Call TitlePage
+Call Instructions
+
+Set F to 5000 + (Random 0 - 2000) (Food)
+Set P to 300 + (Random 0-100) (People)
+Set J (Elapsed seasons) and S (Season) to 0
+
+Loop{
+S++; if s=4 reset s to 1
+J++; Y = (j-1) Div 3 + 1  -- Y is year
+Call NewSeason
+Set an array FL(x) to [0,0,0] (Villages)
+Set TD,TF,FD,FF and VF to 0
+Call Map
+Call Double to display Season S and Year Y 
+If Random(0,2) == 1 Call Attack, Call Flood
+Else Call Flood, Call Attack
+Call Calculate
+Call EndSeason
+
+If P or F is 0 (run out of people or food) then end game
+If J mod 12 == 0 then Call Ritual, no answer Y then end game
+If P<200 and Random(0-3) = 1 call AddThieves
+P = P * 1.045 Rounded up
+}
+
+Map {
+    Draw Map
+    Draw Villages
+}
+
+Instructions {
+    Print game instructions
+    Wait for spacebar
+}
+
+NewSeason {
+    If J is 1 (first turn) then display first turn message
+    Else Display message with population and food levels
+    Get inputs for Defend dyke and work fields
+    Calculate Protect Village (pop - dyke - fields)
+    If S == 2 (season planting) then get how many baskets of rice will be planted (G) and subtract G from F (food)
+    Wait for spacebar
+}
+
+EndSeason {
+    If F (food) is zero then end game with message about food running out
+    If P (people) is zero then end game with message about everyone gone
+    F1=P/(FD+TD+ST+1)
+    F2=F/(TF+FF+1)
+    IF F2<F1 THEN F1=F2
+    Display report based on percent of population loss and food to population ratio
+    Show losses (FD - Flood Deaths, TD - Attack Deaths, ST - Starvation Deaths)
+    Show food lost (FF - Food lost to flooding, TF - Food lost to attacks)
+    Wait for spacebar
+}
+
+AddThieves {
+    Print message about thieves surrendering
+    Add 50 + Random(0-100) to population
+}
+
+Ritual {
+    Print message about the game having gone for Y years and ask if they want to keep playing
+    Get yes or no answer
+}
+
+Attack {
+    Based on season (50%,20%,60%) exit procedure if RND below threshold
+    If VF = 3 exit procedure
+    Randomly select 0-3 and check FL, if it is 1 then try again (randomly choose village to attack ?)
+    Animate attack on Village
+    Calculate damage based on season (200 + RND(70) - defenders, 30 + RND(200) - defenders, RND(400) - defenders)
+    Calculate Losses (I is damage from above, C is defenders):
+    TD=INT(C*I/400):C=C-TD
+    TF=INT(I*F/729+RND(2000-C)/10):IF TF<0 THEN TF=0
+    IF TF>2000 THEN TF=1900+RND(200)
+    F=F-TF
+}
+
+Flood {
+    Based on season calculate flood size (RND(330)/dyke + 1, RND(100)+60/dyke + 1, exit procedure)
+    If size < 1 then exit procedure
+    Animate flood based on flood size
+    Calculate damage based on villages hit
+    VF=FL(1)+FL(2)+FL(3) --Villages flooded
+    OP=A+B+C  -- population is dykes + fields + defenders
+    A=INT((A/10)*(10-FS))  --dyke portion of population hit
+    B=INT((B/10)*(10-FS))  --fields portion of population hit
+    C=INT((C/6)*(6-VF))    --defenders portion of population hit
+    FF=INT(F*VF/6):F=F-FF  --amount of food lost to flooding 
+    FD=OP-A-B-C            --amount of people lost to flooding
+    IF S=2 THEN G=G*(20-FS)/20  -- Growth impact of flood based on season
+    IF S=3 THEN G=G*(10-FS)/10
+}
+
+Calculate {
+    if field workers = 0 then growth = 0
+    else
+    if g>1000 then g = 1000 
+    if g<0 then G = 0
+    calculate growth based on season (0, G*(workers-10)/workers, 18*(11+RND(3))*(0.05-1/workers)*G)
+    increase food by g
+    calculate population by adding dyke + fields + defenders
+    if population = 0 exit procedure
+    T = food / population
+    If T > 5 then T = 4
+    If T < 2 then population = 0, exit procedure (Starvation)
+    If T > 4 then T = 3.5 and ST = 0
+    Else ST = INT(P*(7-T)/7) (starvation deaths) and T = 3
+    Subtract ST from Population
+    F=INT(F-P*T-ST*T/2)  -- work out food to feed population
+    IF F<0 THEN F=0
+}
+
+Variable {
+    Set season names ("Winter","Growing","Harvest")
+    Set village positions
+}
