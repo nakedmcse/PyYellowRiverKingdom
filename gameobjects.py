@@ -22,6 +22,9 @@ class GameState:
         self.Population = self.Population + 50 + random.randint(0,100)
         return
     
+    def year(self):
+        return((self.ElapsedSeasons % 3) + 1)
+    
     def Calculate(self):
         if self.FieldWorkers == 0:
             self.PlantedFood = 0
