@@ -25,6 +25,14 @@ class GameState:
     def year(self):
         return((self.ElapsedSeasons % 3) + 1)
     
+    def nextSeason(self):
+        cases = {
+            "winter": "growing",
+            "growing": "harvest",
+            "harvest": "winter"
+        }
+        return cases.get(self.Season,"unknown")
+    
     def Calculate(self):
         if self.FieldWorkers == 0:
             self.PlantedFood = 0

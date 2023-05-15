@@ -8,20 +8,63 @@ from tkinter import font, messagebox, Label, PhotoImage, Text
 
 # Compute Turn Procedure
 def computeTurn():
+    # Disable UI whilst computing
     startSeasonButton.config(state="disabled")
     shared.fieldWorkersvalue.config(state="disabled")
     shared.dykeWorkersvalue.config(state="disabled")
     shared.militiavalue.config(state="disabled")
     shared.growingvalue.config(state="disabled")
-    fw = shared.fieldWorkersvalue.get()
-    dw = shared.dykeWorkersvalue.get()
-    mi = shared.militiavalue.get()
-    pl = shared.growingvalue.get()
+
+    #Get values
+    fw = int(shared.fieldWorkersvalue.get())
+    dw = int(shared.dykeWorkersvalue.get())
+    mi = int(shared.militiavalue.get())
+    pl = int(shared.growingvalue.get())
+    shared.turns[-1].FieldWorkers = fw
+    shared.turns[-1].DykeWorkers = dw
+    shared.turns[-1].Militia = mi
+    shared.turns[-1].PlantedFood = pl
+    shared.turns[-1].Food = shared.turns[-1].Food - pl
+
     messagebox.showwarning("Compute Turn Called","Compute Turn called with:\n\n"
                            + f"{fw} field workers\n"
                            + f"{dw} dyke workers\n"
                            + f"{mi} militia\n"
                            + f"{pl} planted")
+    
+    #Attacks, Floods
+    villagesHit = random.randint(0,3)
+    if random.randint(0,2) == 1:
+        # Flood
+        shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,villagesHit,0,0,0,0,0,0)
+        shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
+        # TODO - Animate Flooding
+        # Attack
+        shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
+        shared.turns[-1].AttackDamage.Calculate(shared.turns[-1].Season,villagesHit,mi,shared.turns[-1].Food)
+        # TODO - Animate Attack
+    else:
+        # Attack
+        shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
+        shared.turns[-1].AttackDamage.Calculate(shared.turns[-1].Season,villagesHit,mi,shared.turns[-1].Food)
+        # TODO - Animate Attack
+        # Flood
+        shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,villagesHit,0,0,0,0,0,0)
+        shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
+        # TODO - Animate Flooding
+    
+    messagebox.showwarning("Caculation Outputs","Outputs:\n\n"
+                           + "FLOOD DAMAGE\n"
+                           + f"{villagesHit} Villages Hit by Flooding\n"
+                           + f"{shared.turns[-1].FloodDamage.FloodSize} Flood Size\n"
+                           + f"{shared.turns[-1].FloodDamage.DykeWorkersKilled} Dyke Workers Killed\n"
+                           + f"{shared.turns[-1].FloodDamage.FieldWorkersKilled} Field Worked Killed\n"
+                           + f"{shared.turns[-1].FloodDamage.MilitiaKilled} Militia Killed\n"
+                           + f"{shared.turns[-1].FloodDamage.FoodLost} Food Lost\n"
+                           + f"{shared.turns[-1].FloodDamage.PlantedFoodMultiplier} Planted Food Multiplier\n\n"
+                           + "ATTACK DAMAGE\n"
+                           + f"{shared.turns[-1].AttackDamage.MilitiaKilled} Militia Killed\n"
+                           + f"{shared.turns[-1].AttackDamage.FoodLost} Food Lost")
 
 # Show Splash Window
 def showSplashWindow():
