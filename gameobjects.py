@@ -5,8 +5,10 @@ import random
 class GameState:
     def __init__(self,f,g,p,fw,dw,m,s,j,fd,ad):
         self.Food = f
+        self.StartingFood = f
         self.PlantedFood = g
         self.Population = p
+        self.StartingPopulation = p
         self.FieldWorkers = fw
         self.DykeWorkers = dw
         self.Militia = m
@@ -23,7 +25,7 @@ class GameState:
         return
     
     def year(self):
-        return((self.ElapsedSeasons % 3) + 1)
+        return(int(self.ElapsedSeasons / 3) + 1)
     
     def nextSeason(self):
         cases = {
@@ -66,10 +68,18 @@ class GameState:
         else:
             StarvationDeaths = int(round(self.Population * (7 - FoodRatio)/7))
             FoodRatio = 3
+            self.Population = self.Population - StarvationDeaths
+            if self.Population < 0:
+                self.Population = 0
 
         self.Food = int(round(self.Food - self.Population * FoodRatio - StarvationDeaths * (FoodRatio / 2)))
         if self.Food < 0:
             self.Food = 0
+
+        # Handle population increase
+        if self.Population < 200 and random.randint(0,3) == 1:
+            self.addThieves()
+        self.Population = int(round(self.Population * 1.045))
         return
     
 # Flood damage

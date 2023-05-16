@@ -53,6 +53,9 @@ def computeTurn():
         shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
         # TODO - Animate Flooding
     
+    #Starvation, Food growing, Population growth
+    shared.turns[-1].Calculate()
+
     messagebox.showwarning("Caculation Outputs","Outputs:\n\n"
                            + "FLOOD DAMAGE\n"
                            + f"{villagesHit} Villages Hit by Flooding\n"
@@ -64,7 +67,39 @@ def computeTurn():
                            + f"{shared.turns[-1].FloodDamage.PlantedFoodMultiplier} Planted Food Multiplier\n\n"
                            + "ATTACK DAMAGE\n"
                            + f"{shared.turns[-1].AttackDamage.MilitiaKilled} Militia Killed\n"
-                           + f"{shared.turns[-1].AttackDamage.FoodLost} Food Lost")
+                           + f"{shared.turns[-1].AttackDamage.FoodLost} Food Lost\n\n"
+                           + "CROPS/POPULATION\n"
+                           + f"{shared.turns[-1].Population - shared.turns[-1].StartingPopulation} Population Change\n"
+                           + f"{shared.turns[-1].Food - shared.turns[-1].StartingFood} Food Change")
+    
+    # Create next turn
+    shared.turns.append(gameobjects.GameState(f=shared.turns[-1].Food,g=shared.turns[-1].PlantedFood,p=shared.turns[-1].Population,
+                                       fw=0,dw=0,m=0,s=shared.turns[-1].nextSeason(),j=shared.turns[-1].ElapsedSeasons + 1,fd=None,ad=None))
+    
+    # Update HUD fields
+    seasonvalue.config(text=shared.turns[-1].Season.capitalize())
+    yearvalue.config(text=shared.turns[-1].year())
+    populationvalue.config(text=shared.turns[-1].Population)
+    foodvalue.config(text=shared.turns[-1].Food)
+    shared.growingvalue.delete(0,tk.END)
+    shared.growingvalue.insert(0,shared.turns[-1].PlantedFood)
+    shared.fieldWorkersvalue.delete(0,tk.END)
+    shared.fieldWorkersvalue.insert(0,shared.turns[-1].FieldWorkers)
+    shared.dykeWorkersvalue.delete(0,tk.END)
+    shared.dykeWorkersvalue.insert(0,shared.turns[-1].DykeWorkers)
+    shared.militiavalue.delete(0,tk.END)
+    shared.militiavalue.insert(0,shared.turns[-1].Militia)
+    window.update()
+
+    # Re-enable HUD controls
+    startSeasonButton.config(state="normal")
+    shared.fieldWorkersvalue.config(state="normal")
+    shared.dykeWorkersvalue.config(state="normal")
+    shared.militiavalue.config(state="normal")
+    if(shared.turns[-1].Season == "winter"):
+        shared.growingvalue.config(state="disabled")
+    else:
+        shared.growingvalue.config(state="normal")
 
 # Show Splash Window
 def showSplashWindow():
