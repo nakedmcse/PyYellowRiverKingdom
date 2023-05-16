@@ -25,12 +25,6 @@ def computeTurn():
     shared.turns[-1].Militia = mi
     shared.turns[-1].PlantedFood = pl
     shared.turns[-1].Food = shared.turns[-1].Food - pl
-
-    messagebox.showwarning("Compute Turn Called","Compute Turn called with:\n\n"
-                           + f"{fw} field workers\n"
-                           + f"{dw} dyke workers\n"
-                           + f"{mi} militia\n"
-                           + f"{pl} planted")
     
     #Attacks, Floods
     villagesHit = random.randint(0,3)
@@ -60,9 +54,9 @@ def computeTurn():
                            + "FLOOD DAMAGE\n"
                            + f"{villagesHit} Villages Hit by Flooding\n"
                            + f"{shared.turns[-1].FloodDamage.FloodSize} Flood Size\n"
-                           + f"{shared.turns[-1].FloodDamage.DykeWorkersKilled} Dyke Workers Killed\n"
-                           + f"{shared.turns[-1].FloodDamage.FieldWorkersKilled} Field Worked Killed\n"
-                           + f"{shared.turns[-1].FloodDamage.MilitiaKilled} Militia Killed\n"
+                           + f"{int(shared.turns[-1].FloodDamage.DykeWorkersKilled)} Dyke Workers Killed\n"
+                           + f"{int(shared.turns[-1].FloodDamage.FieldWorkersKilled)} Field Workers Killed\n"
+                           + f"{int(shared.turns[-1].FloodDamage.MilitiaKilled)} Militia Killed\n"
                            + f"{shared.turns[-1].FloodDamage.FoodLost} Food Lost\n"
                            + f"{shared.turns[-1].FloodDamage.PlantedFoodMultiplier} Planted Food Multiplier\n\n"
                            + "ATTACK DAMAGE\n"
@@ -73,7 +67,10 @@ def computeTurn():
                            + f"{shared.turns[-1].Food - shared.turns[-1].StartingFood} Food Change")
     
     # Create next turn
-    shared.turns.append(gameobjects.GameState(f=shared.turns[-1].Food,g=shared.turns[-1].PlantedFood,p=shared.turns[-1].Population,
+    nextPlanted = shared.turns[-1].PlantedFood
+    if shared.turns[-1].Season == "harvest":
+        nextPlanted = 0
+    shared.turns.append(gameobjects.GameState(f=shared.turns[-1].Food,g=nextPlanted,p=shared.turns[-1].Population,
                                        fw=0,dw=0,m=0,s=shared.turns[-1].nextSeason(),j=shared.turns[-1].ElapsedSeasons + 1,fd=None,ad=None))
     
     # Update HUD fields
