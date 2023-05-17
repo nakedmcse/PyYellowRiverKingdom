@@ -232,6 +232,16 @@ def showHUD():
     hud_frame.grid_columnconfigure(4,weight=1)
     hud_frame.grid_columnconfigure(5,weight=1)
 
+# Show Map
+def showMap():
+    global window
+    global map_frame
+    game_font = font.Font(size=16)
+    map_frame = tk.LabelFrame(window, padx=0, pady=0, width=800, height=620, background="dark green")
+    map_frame.pack(padx=5, pady=5, fill="x", side="bottom")
+    river = tk.Canvas(map_frame,width = 150, height = 650, border=0, background="dark blue")
+    river.place(x = 0, y = 0)
+
 # Game variables
 shared.turns = []
 startGame = False
@@ -250,10 +260,11 @@ if startGame:
     # Create first turn
     shared.turns.append(gameobjects.GameState(f=5000 + random.randint(0,2000),g=0,p=300 + random.randint(0,100),
                                        fw=0,dw=0,m=0,s="winter",j=0,fd=None,ad=None))
-    
-    
-    # Render Map - TODO
+        
     # Render HUD
     showHUD()
+
+    # Render Map
+    showMap()
 
     window.mainloop()
