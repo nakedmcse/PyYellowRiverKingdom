@@ -48,3 +48,7 @@ def validate_planted():
     elif(pl > 1000):
         shared.growingvalue.delete(0,tk.END)
         shared.growingvalue.insert(0,1000) 
+
+# Submitted Population - validate submitted population not > actual population
+def validate_submitted_population(fw,dw,mi):
+    return ((fw + dw + mi) <= shared.turns[-1].Population)

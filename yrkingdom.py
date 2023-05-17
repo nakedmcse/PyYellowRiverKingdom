@@ -8,25 +8,32 @@ from tkinter import font, messagebox, Label, PhotoImage, Text
 
 # Compute Turn Procedure
 def computeTurn():
+    # Get values
+    fw = int(shared.fieldWorkersvalue.get())
+    dw = int(shared.dykeWorkersvalue.get())
+    mi = int(shared.militiavalue.get())
+    pl = int(shared.growingvalue.get())
+
+    # Validate Population
+    if validations.validate_submitted_population(fw,dw,mi) == False:
+        messagebox.showerror("Population Mismatch",f"Your selections ({fw + dw + mi}) exceed your population - please try again")
+        return
+
+    # Fill in turn values
+    shared.turns[-1].FieldWorkers = fw
+    shared.turns[-1].DykeWorkers = dw
+    shared.turns[-1].Militia = mi
+    shared.turns[-1].PlantedFood = pl
+    shared.turns[-1].Food = shared.turns[-1].Food - pl
+
     # Disable UI whilst computing
     startSeasonButton.config(state="disabled")
     shared.fieldWorkersvalue.config(state="disabled")
     shared.dykeWorkersvalue.config(state="disabled")
     shared.militiavalue.config(state="disabled")
     shared.growingvalue.config(state="disabled")
-
-    #Get values
-    fw = int(shared.fieldWorkersvalue.get())
-    dw = int(shared.dykeWorkersvalue.get())
-    mi = int(shared.militiavalue.get())
-    pl = int(shared.growingvalue.get())
-    shared.turns[-1].FieldWorkers = fw
-    shared.turns[-1].DykeWorkers = dw
-    shared.turns[-1].Militia = mi
-    shared.turns[-1].PlantedFood = pl
-    shared.turns[-1].Food = shared.turns[-1].Food - pl
     
-    #Attacks, Floods
+    # Attacks, Floods
     villagesHit = random.randint(0,3)
     if random.randint(0,2) == 1:
         # Flood
@@ -105,7 +112,7 @@ def computeTurn():
     shared.fieldWorkersvalue.config(state="normal")
     shared.dykeWorkersvalue.config(state="normal")
     shared.militiavalue.config(state="normal")
-    if(shared.turns[-1].Season == "winter"):
+    if(shared.turns[-1].Season != "growing"):
         shared.growingvalue.config(state="disabled")
     else:
         shared.growingvalue.config(state="normal")
@@ -149,28 +156,17 @@ def showInstructions():
         + "The river is likely to flood the fields and the villages. The high dyke between the river and the fields must be kept up to prevent a serious flood.\n\n"
         + "The people live off the rice that they have grown. It is a very poor living. You must decide what the people will work at each season so that they prosper under your leadership.")
 
-# Game variables
-shared.turns = []
-startGame = False
-
-# Program Start Point
-showSplashWindow()
-
-if startGame:
-    showInstructions()
-
-    # Main Game
-    window = tk.Tk()
-    window.title("Yellow River Kingdom")
-    window.geometry("1024x800")
-
-    # Create first turn
-    shared.turns.append(gameobjects.GameState(f=5000 + random.randint(0,2000),g=0,p=300 + random.randint(0,100),
-                                       fw=0,dw=0,m=0,s="winter",j=0,fd=None,ad=None))
+# Show HUD
+def showHUD():
+    global window
+    global startSeasonButton
+    global seasonvalue
+    global yearvalue
+    global populationvalue
+    global foodvalue
+    global hud_frame
     
     game_font = font.Font(size=16)
-    # Render Map - TODO
-    # Render HUD
     hud_frame = tk.LabelFrame(window, text = "Statistics", padx=5,pady=5)
     hud_frame.pack(padx=5, pady=5, fill="x", side="bottom")
 
@@ -200,7 +196,7 @@ if startGame:
     shared.growingvalue.insert(0,shared.turns[-1].PlantedFood)
     shared.growingvalue.grid(row=1, column=5, sticky="w", padx=5)
     shared.growingvalue.bind("<KeyPress>", validations.validate_numeric)
-    if(shared.turns[-1].Season == "winter"):
+    if(shared.turns[-1].Season != "growing"):
         shared.growingvalue.config(state="disabled")
     else:
         shared.growingvalue.config(state="normal")
@@ -235,5 +231,29 @@ if startGame:
     hud_frame.grid_columnconfigure(3,weight=1)
     hud_frame.grid_columnconfigure(4,weight=1)
     hud_frame.grid_columnconfigure(5,weight=1)
+
+# Game variables
+shared.turns = []
+startGame = False
+
+# Program Start Point
+showSplashWindow()
+
+if startGame:
+    showInstructions()
+
+    # Main Game
+    window = tk.Tk()
+    window.title("Yellow River Kingdom")
+    window.geometry("1024x800")
+
+    # Create first turn
+    shared.turns.append(gameobjects.GameState(f=5000 + random.randint(0,2000),g=0,p=300 + random.randint(0,100),
+                                       fw=0,dw=0,m=0,s="winter",j=0,fd=None,ad=None))
+    
+    
+    # Render Map - TODO
+    # Render HUD
+    showHUD()
 
     window.mainloop()
