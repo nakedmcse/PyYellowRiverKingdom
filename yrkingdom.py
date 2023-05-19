@@ -57,22 +57,18 @@ def computeTurn():
     #Starvation, Food growing, Population growth
     shared.turns[-1].Calculate()
 
-    messagebox.showwarning("Caculation Outputs","Outputs:\n\n"
-                           + "FLOOD DAMAGE\n"
-                           + f"{villagesHit} Villages Hit by Flooding\n"
-                           + f"{shared.turns[-1].FloodDamage.FloodSize} Flood Size\n"
-                           + f"{int(shared.turns[-1].FloodDamage.DykeWorkersKilled)} Dyke Workers Killed\n"
-                           + f"{int(shared.turns[-1].FloodDamage.FieldWorkersKilled)} Field Workers Killed\n"
-                           + f"{int(shared.turns[-1].FloodDamage.MilitiaKilled)} Militia Killed\n"
-                           + f"{shared.turns[-1].FloodDamage.FoodLost} Food Lost\n"
-                           + f"{shared.turns[-1].FloodDamage.PlantedFoodMultiplier} Planted Food Multiplier\n\n"
-                           + "ATTACK DAMAGE\n"
-                           + f"{shared.turns[-1].AttackDamage.MilitiaKilled} Militia Killed\n"
-                           + f"{shared.turns[-1].AttackDamage.FoodLost} Food Lost\n\n"
-                           + "CROPS/POPULATION\n"
-                           + f"{shared.turns[-1].Population - shared.turns[-1].StartingPopulation} Population Change\n"
-                           + f"{shared.turns[-1].Food - shared.turns[-1].StartingFood} Food Change")
+    #Show turn report
+    showReport(villagesHit)
     
+    # Check for losing game
+    if shared.turns[-1].checkEndGame():
+        if shared.turns[-1].Food <= 0:
+            failStarvation()
+            window.quit()
+        else:
+            failPopulation()
+            window.quit()
+
     # Create next turn
     nextPlanted = shared.turns[-1].PlantedFood
     if shared.turns[-1].Season == "harvest":
@@ -156,6 +152,60 @@ def showInstructions():
         + "The river is likely to flood the fields and the villages. The high dyke between the river and the fields must be kept up to prevent a serious flood.\n\n"
         + "The people live off the rice that they have grown. It is a very poor living. You must decide what the people will work at each season so that they prosper under your leadership.")
 
+# Show failed starvation message
+def failStarvation():
+    messagebox.showerror("STARVATION","There was no food left. All of the people have run off and joined up "
+                         + f"with the thieves after {shared.turns[-1].ElapsedSeasons} seasons of your misrule.")
+    
+# Show failed starvation message
+def failPopulation():
+    yearsmsg = f"{shared.turns[-1].year()} year"
+    if shared.turns[-1].year() > 1:
+        yearsmsg = yearsmsg + "s"
+    messagebox.showerror("POPULATION GONE","There is no-one left! They have all been killed off by your decisions "
+                         + f"after only {yearsmsg} of your misrule.")
+    
+# Show end of season report
+def showReport(villages):
+    populationLoss = shared.turns[-1].Population / shared.turns[-1].StartingPopulation
+    foodLoss = shared.turns[-1].Food / shared.turns[-1].Population
+    
+    populationMsg = ""
+    if populationLoss < 0.5:
+        populationMsg = "DISASTEROUS LOSSES!"
+    elif populationLoss < 0.8:
+        populationMsg = "WORRYING LOSSES!"
+    elif populationLoss < 0.9:
+        populationMsg = "You got off lightly"
+    else:
+        populationMsg = "Nothing to worry about"
+
+    foodMsg = ""
+    if foodLoss < 0.5:
+        foodMsg = "STARVATION IMMINENT!"
+    elif foodLoss < 0.75:
+        foodMsg = "FOOD SUPPLY IS LOW!"
+    else:
+        foodMsg = "Nothing to worry about"
+
+    messagebox.showwarning("Village Leader's Report",f"In the {shared.turns[-1].Season} Season of year {shared.turns[-1].year()} of your reign, the kingdom has suffered these losses:\n\n"
+                           + f"{populationMsg}\n\n"
+                           + "FLOOD DAMAGE\n"
+                           + f"{villages} Villages Hit by Flooding\n"
+                           + f"{shared.turns[-1].FloodDamage.FloodSize} Flood Size\n"
+                           + f"{int(shared.turns[-1].FloodDamage.DykeWorkersKilled)} Dyke Workers Killed\n"
+                           + f"{int(shared.turns[-1].FloodDamage.FieldWorkersKilled)} Field Workers Killed\n"
+                           + f"{int(shared.turns[-1].FloodDamage.MilitiaKilled)} Militia Killed\n"
+                           + f"{shared.turns[-1].FloodDamage.FoodLost} Food Lost\n"
+                           + f"{shared.turns[-1].FloodDamage.PlantedFoodMultiplier} Planted Food Multiplier\n\n"
+                           + "ATTACK DAMAGE\n"
+                           + f"{shared.turns[-1].AttackDamage.MilitiaKilled} Militia Killed\n"
+                           + f"{shared.turns[-1].AttackDamage.FoodLost} Food Lost\n\n"
+                           + "CROPS/POPULATION\n"
+                           + f"\n{foodMsg}\n\n"
+                           + f"{shared.turns[-1].Population - shared.turns[-1].StartingPopulation} Population Change\n"
+                           + f"{shared.turns[-1].Food - shared.turns[-1].StartingFood} Food Change")
+    
 # Show HUD
 def showHUD():
     global window
