@@ -46,11 +46,12 @@ class GameState:
         # Calculate Growth by Season
         if self.Season == "growing":
             self.PlantedFood = int(round(self.PlantedFood * ((self.FieldWorkers - 10)/self.FieldWorkers)))
+            self.PlantedFood = int(self.PlantedFood * self.FloodDamage.PlantedFoodMultiplier)
         elif self.Season == "harvest":
             self.PlantedFood = int(round(18 * (11 + random.randint(0,3)) * (0.05 - 1/self.FieldWorkers) * self.PlantedFood))
-        
-        # Increase Food
-        self.Food = self.Food + self.PlantedFood
+            self.PlantedFood = int(self.PlantedFood * self.FloodDamage.PlantedFoodMultiplier)
+            # Increase Food
+            self.Food = self.Food + self.PlantedFood
         
         # Consume Food based on population
         if self.Population <= 0:
@@ -75,6 +76,10 @@ class GameState:
         self.Food = int(round(self.Food - self.Population * FoodRatio - StarvationDeaths * (FoodRatio / 2)))
         if self.Food < 0:
             self.Food = 0
+
+        # Handle population decrease
+        self.Population = self.Population - int(self.FloodDamage.DykeWorkersKilled) - int(self.FloodDamage.FieldWorkersKilled) - int(self.FloodDamage.MilitiaKilled)
+        self.Population = self.Population - int(self.AttackDamage.MilitiaKilled)
 
         # Handle population increase
         if self.Population < 200 and random.randint(0,3) == 1:
