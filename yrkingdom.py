@@ -69,6 +69,10 @@ def computeTurn():
             failPopulation()
             window.quit()
 
+    # Check for ritual call
+    if shared.turns[-1].ElapsedSeasons % 12 == 0:
+        showRitual()
+
     # Create next turn
     nextPlanted = shared.turns[-1].PlantedFood
     if shared.turns[-1].Season == "harvest":
@@ -164,7 +168,15 @@ def failPopulation():
         yearsmsg = yearsmsg + "s"
     messagebox.showerror("POPULATION GONE","There is no-one left! They have all been killed off by your decisions "
                          + f"after only {yearsmsg} of your misrule.")
-    
+
+# Show ritual (ability to quit every 12 seasons)
+def showRitual():
+    result = messagebox.askyesno("Village Ritual",f"We have survived for {shared.turns[-1].years()} years under your glorious control. "
+                        + "By an ancient custom we must offer you the chance to lay down this terrible burden "
+                        + "resume a normal life.\n\nAre you prepared to accept the burden of decision again?")
+    if result == False:
+        window.quit()  
+
 # Show end of season report
 def showReport(villages):
     populationLoss = shared.turns[-1].Population / shared.turns[-1].StartingPopulation
