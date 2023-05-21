@@ -299,10 +299,18 @@ def showMap():
     global window
     global map_frame
     game_font = font.Font(size=16)
-    map_frame = tk.LabelFrame(window, padx=0, pady=0, width=800, height=620, background="dark green")
+    map_frame = tk.LabelFrame(window, padx=0, pady=0, width=800, height=620, background="#6d9f56")
     map_frame.pack(padx=5, pady=5, fill="x", side="bottom")
-    river = tk.Canvas(map_frame,width = 150, height = 650, border=0, background="dark blue")
+    river = tk.Canvas(map_frame,width = 150, height = 650, border=0, background="#50a4ac")
     river.place(x = 0, y = 0)
+    # Villages
+    village_image = PhotoImage(file="Assets/village.png")
+    village1 = tk.Label(window, image=village_image, width=64, height=64)
+    village1.place(x=350,y=150)
+    village2 = tk.Label(window, image=village_image, width=64, height=64)
+    village2.place(x=500,y=300)
+    village3 = tk.Label(window, image=village_image, width=64, height=64)
+    village3.place(x=500,y=450)
 
 # Game variables
 shared.turns = []
