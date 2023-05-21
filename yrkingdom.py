@@ -296,8 +296,7 @@ def showHUD():
 
 # Show Map
 def showMap():
-    global window
-    global map_frame
+    global window,map_frame,village_image,scaled_village
     game_font = font.Font(size=16)
     map_frame = tk.LabelFrame(window, padx=0, pady=0, width=800, height=620, background="#6d9f56")
     map_frame.pack(padx=5, pady=5, fill="x", side="bottom")
@@ -305,11 +304,14 @@ def showMap():
     river.place(x = 0, y = 0)
     # Villages
     village_image = PhotoImage(file="Assets/village.png")
-    village1 = tk.Label(window, image=village_image, width=64, height=64)
+    width_scale = village_image.width() // 64
+    height_scale = village_image.height() // 64
+    scaled_village = village_image.subsample(width_scale,height_scale)
+    village1 = tk.Label(map_frame, image=scaled_village, border=0)
     village1.place(x=350,y=150)
-    village2 = tk.Label(window, image=village_image, width=64, height=64)
+    village2 = tk.Label(map_frame, image=scaled_village, border=0)
     village2.place(x=500,y=300)
-    village3 = tk.Label(window, image=village_image, width=64, height=64)
+    village3 = tk.Label(map_frame, image=scaled_village, border=0)
     village3.place(x=500,y=450)
 
 # Game variables
