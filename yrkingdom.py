@@ -70,7 +70,7 @@ def computeTurn():
             window.quit()
 
     # Check for ritual call
-    if shared.turns[-1].ElapsedSeasons % 12 == 0:
+    if shared.turns[-1].ElapsedSeasons % 12 == 0 and shared.turns[-1].ElapsedSeasons > 0:
         showRitual()
 
     # Create next turn
@@ -171,7 +171,7 @@ def failPopulation():
 
 # Show ritual (ability to quit every 12 seasons)
 def showRitual():
-    result = messagebox.askyesno("Village Ritual",f"We have survived for {shared.turns[-1].years()} years under your glorious control. "
+    result = messagebox.askyesno("Village Ritual",f"We have survived for {shared.turns[-1].year()} years under your glorious control. "
                         + "By an ancient custom we must offer you the chance to lay down this terrible burden "
                         + "resume a normal life.\n\nAre you prepared to accept the burden of decision again?")
     if result == False:
@@ -180,7 +180,7 @@ def showRitual():
 # Show end of season report
 def showReport(villages):
     populationLoss = shared.turns[-1].Population / shared.turns[-1].StartingPopulation
-    foodLoss = shared.turns[-1].Food / shared.turns[-1].Population
+    foodLoss = shared.turns[-1].Food / (shared.turns[-1].Population + 1)
     
     populationMsg = ""
     if populationLoss < 0.5:
@@ -296,9 +296,9 @@ def showHUD():
 
 # Show Map
 def showMap():
-    global window,map_frame,village_image,scaled_village
+    global window,map_frame,village_image,scaled_village,mountain_image,scaled_mountain
     game_font = font.Font(size=16)
-    map_frame = tk.LabelFrame(window, padx=0, pady=0, width=800, height=620, background="#6d9f56")
+    map_frame = tk.LabelFrame(window, padx=0, pady=0, border=0, width=800, height=620, background="#6d9f56")
     map_frame.pack(padx=5, pady=5, fill="x", side="bottom")
     river = tk.Canvas(map_frame,width = 150, height = 650, border=0, background="#50a4ac")
     river.place(x = 0, y = 0)
@@ -313,7 +313,35 @@ def showMap():
     village2.place(x=500,y=300)
     village3 = tk.Label(map_frame, image=scaled_village, border=0)
     village3.place(x=500,y=450)
-
+    # Mountains
+    mountain_image = PhotoImage(file="Assets/mountain.png")
+    scaled_mountain = mountain_image.subsample(2,2)
+    mountain1 = tk.Label(map_frame, image=mountain_image, border=0)
+    mountain1.place(x=650,y=0)
+    mountain1a = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain1a.place(x=850,y=10)
+    mountain1b = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain1b.place(x=920,y=80)
+    mountain1c = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain1c.place(x=800,y=100)
+    mountain1d = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain1d.place(x=870,y=150)
+    mountain2 = tk.Label(map_frame, image=mountain_image, border=0)
+    mountain2.place(x=750,y=200)
+    mountain2a = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain2a.place(x=920,y=220)
+    mountain2b = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain2b.place(x=810,y=300)
+    mountain3 = tk.Label(map_frame, image=mountain_image, border=0)
+    mountain3.place(x=800,y=375)
+    mountain3a = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain3a.place(x=920,y=350)
+    mountain3b = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain3b.place(x=840,y=500)
+    mountain3c = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain3c.place(x=910,y=472)
+    mountain3d = tk.Label(map_frame, image=scaled_mountain, border=0)
+    mountain3d.place(x=920,y=550)
 # Game variables
 shared.turns = []
 startGame = False
