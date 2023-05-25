@@ -296,11 +296,13 @@ def showHUD():
 
 # Show Map
 def showMap():
-    global window,map_frame,village_image,scaled_village,mountain_image,scaled_mountain
+    global window,map_frame,river_image,village_image,scaled_village,mountain_image,scaled_mountain
     game_font = font.Font(size=16)
     map_frame = tk.LabelFrame(window, padx=0, pady=0, border=0, width=800, height=620, background="#6d9f56")
     map_frame.pack(padx=5, pady=5, fill="x", side="bottom")
-    river = tk.Canvas(map_frame,width = 150, height = 650, border=0, background="#50a4ac")
+    # River
+    river_image = PhotoImage(file="Assets/river.png")
+    river = tk.Label(map_frame, image=river_image, border=0)
     river.place(x = 0, y = 0)
     # Villages
     village_image = PhotoImage(file="Assets/village.png")
