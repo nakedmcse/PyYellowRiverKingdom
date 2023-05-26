@@ -3,6 +3,7 @@ import gameobjects
 import shared
 import validations
 import random
+import time
 import tkinter as tk
 from tkinter import font, messagebox, Label, PhotoImage, Text
 
@@ -298,8 +299,8 @@ def showHUD():
 def showMap():
     global window,map_frame,river_image,village_image,scaled_village,mountain_image,scaled_mountain
     game_font = font.Font(size=16)
-    map_frame = tk.LabelFrame(window, padx=0, pady=0, border=0, width=800, height=620, background="#6d9f56")
-    map_frame.pack(padx=5, pady=5, fill="x", side="bottom")
+    map_frame = tk.Canvas(window, border=0, width=800, height=625, background="#6d9f56")
+    map_frame.pack(padx=0, pady=0, fill="both", side="bottom")
     # River
     river_image = PhotoImage(file="Assets/river.png")
     river = tk.Label(map_frame, image=river_image, border=0)
@@ -344,6 +345,48 @@ def showMap():
     mountain3c.place(x=910,y=472)
     mountain3d = tk.Label(map_frame, image=scaled_mountain, border=0)
     mountain3d.place(x=920,y=550)
+
+# Animate attack
+def startAttack(v):
+    global map_frame, ball_speed, ball, ball_moving
+    match v:
+        case 1:
+            x1 = 700
+            y1 = 180
+            x2 = 710
+            y2 = 190
+        case 2:
+            x1 = 700
+            y1 = 330
+            x2 = 710
+            y2 = 340
+        case 3:
+            x1 = 700
+            y1 = 480
+            x2 = 710
+            y2 = 490
+    ball = map_frame.create_oval(x1, y1, x2, y2, fill='red')
+    ball_speed = -3
+    ball_moving = True
+    attackAnimate(v)
+
+def attackAnimate(v):
+    global map_frame, ball, ball_moving, ball_speed, window
+    match v:
+        case 1: xlim = 420
+        case 2: xlim = 570
+        case 3: xlim = 570
+    x, y, x1, y1 =  map_frame.coords(ball)
+    if x <= xlim:
+        ball_speed = -ball_speed
+    if x >= 780:
+        ball_moving = False
+        map_frame.delete(ball)
+    
+    if(ball_moving):
+        map_frame.move(ball,ball_speed,0)
+        window.after(20, attackAnimate, v)
+
 # Game variables
 shared.turns = []
 startGame = False
@@ -368,5 +411,8 @@ if startGame:
 
     # Render Map
     showMap()
+
+    # TEST ANIMATION
+    startAttack(1)
 
     window.mainloop()
