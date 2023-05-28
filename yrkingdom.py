@@ -9,6 +9,7 @@ from tkinter import font, messagebox, Label, PhotoImage, Text
 
 # Compute Turn Procedure
 def computeTurn():
+    global villagesHit
     # Get values
     fw = int(shared.fieldWorkersvalue.get())
     dw = int(shared.dykeWorkersvalue.get())
@@ -18,6 +19,12 @@ def computeTurn():
     # Validate Population
     if validations.validate_submitted_population(fw,dw,mi) == False:
         messagebox.showerror("Population Mismatch",f"Your selections ({fw + dw + mi}) exceed your population - please try again")
+        return
+    
+    # Validate Planted
+    if pl == 0 and shared.turns[-1].Season == "growing":
+        messagebox.showerror("Nothing Planted", "You have planted no food!\n\nPlease enter the amount of food to plant.")
+        shared.growingvalue.focus_set()
         return
 
     # Fill in turn values
@@ -44,12 +51,11 @@ def computeTurn():
         # Attack
         shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
         shared.turns[-1].AttackDamage.Calculate(shared.turns[-1].Season,villagesHit,mi,shared.turns[-1].Food)
-        # TODO - Animate Attack
+        
     else:
         # Attack
         shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
         shared.turns[-1].AttackDamage.Calculate(shared.turns[-1].Season,villagesHit,mi,shared.turns[-1].Food)
-        # TODO - Animate Attack
         # Flood
         shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,villagesHit,0,0,0,0,0,0)
         shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
@@ -57,7 +63,10 @@ def computeTurn():
     
     #Starvation, Food growing, Population growth
     shared.turns[-1].Calculate()
+    #Animations
+    startAttack(random.randint(1,3),computeReport)
 
+def computeReport():
     #Show turn report
     showReport(villagesHit)
     
@@ -90,21 +99,29 @@ def computeTurn():
     shared.growingvalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_planted)
     shared.growingvalue.insert(0,shared.turns[-1].PlantedFood)
     shared.growingvalue.grid(row=1, column=5, sticky="w", padx=5)
+    shared.growingvalue.bind("<Tab>",set_focus_next)
+    shared.growingvalue.bind("<Shift-Tab>",set_focus_prev)
     shared.growingvalue.bind("<KeyPress>", validations.validate_numeric)
     shared.fieldWorkersvalue.destroy()
     shared.fieldWorkersvalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_population)
     shared.fieldWorkersvalue.insert(0,shared.turns[-1].FieldWorkers)
     shared.fieldWorkersvalue.grid(row=2, column=1, sticky="w", padx=5)
+    shared.fieldWorkersvalue.bind("<Tab>",set_focus_next)
+    shared.fieldWorkersvalue.bind("<Shift-Tab>",set_focus_prev)
     shared.fieldWorkersvalue.bind("<KeyPress>", validations.validate_numeric)
     shared.dykeWorkersvalue.destroy()
     shared.dykeWorkersvalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_population)
     shared.dykeWorkersvalue.insert(0,shared.turns[-1].DykeWorkers)
     shared.dykeWorkersvalue.grid(row=2, column=3, sticky="w", padx=5)
+    shared.dykeWorkersvalue.bind("<Tab>",set_focus_next)
+    shared.dykeWorkersvalue.bind("<Shift-Tab>",set_focus_prev)
     shared.dykeWorkersvalue.bind("<KeyPress>", validations.validate_numeric)
     shared.militiavalue.destroy()
     shared.militiavalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_population)
     shared.militiavalue.insert(0,shared.turns[-1].Militia)
     shared.militiavalue.grid(row=2, column=5, sticky="w", padx=5)
+    shared.militiavalue.bind("<Tab>",set_focus_next)
+    shared.militiavalue.bind("<Shift-Tab>",set_focus_prev)
     shared.militiavalue.bind("<KeyPress>", validations.validate_numeric)
     window.update()
 
@@ -218,7 +235,14 @@ def showReport(villages):
                            + f"\n{foodMsg}\n\n"
                            + f"{shared.turns[-1].Population - shared.turns[-1].StartingPopulation} Population Change\n"
                            + f"{shared.turns[-1].Food - shared.turns[-1].StartingFood} Food Change")
-    
+
+# TAB Movement functions
+def set_focus_next(event):
+    event.widget.tk_focusNext().focus()
+
+def set_focus_prev(event):
+    event.widget.tk_focusPrev().focus()
+
 # Show HUD
 def showHUD():
     global window
@@ -258,6 +282,8 @@ def showHUD():
     shared.growingvalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_planted)
     shared.growingvalue.insert(0,shared.turns[-1].PlantedFood)
     shared.growingvalue.grid(row=1, column=5, sticky="w", padx=5)
+    shared.growingvalue.bind("<Tab>",set_focus_next)
+    shared.growingvalue.bind("<Shift-Tab>",set_focus_prev)
     shared.growingvalue.bind("<KeyPress>", validations.validate_numeric)
     if(shared.turns[-1].Season != "growing"):
         shared.growingvalue.config(state="disabled")
@@ -269,6 +295,8 @@ def showHUD():
     shared.fieldWorkersvalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_population)
     shared.fieldWorkersvalue.insert(0,shared.turns[-1].FieldWorkers)
     shared.fieldWorkersvalue.grid(row=2, column=1, sticky="w", padx=5)
+    shared.fieldWorkersvalue.bind("<Tab>",set_focus_next)
+    shared.fieldWorkersvalue.bind("<Shift-Tab>",set_focus_prev)
     shared.fieldWorkersvalue.bind("<KeyPress>", validations.validate_numeric)
 
     dykeWorkerslabel = tk.Label(hud_frame,text="Dyke Workers:",font=game_font)
@@ -276,6 +304,8 @@ def showHUD():
     shared.dykeWorkersvalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_population)
     shared.dykeWorkersvalue.insert(0,shared.turns[-1].DykeWorkers)
     shared.dykeWorkersvalue.grid(row=2, column=3, sticky="w", padx=5)
+    shared.dykeWorkersvalue.bind("<Tab>",set_focus_next)
+    shared.dykeWorkersvalue.bind("<Shift-Tab>",set_focus_prev)
     shared.dykeWorkersvalue.bind("<KeyPress>", validations.validate_numeric)
 
     militialabel = tk.Label(hud_frame,text="Militia:",font=game_font)
@@ -283,6 +313,8 @@ def showHUD():
     shared.militiavalue = tk.Entry(hud_frame, validate='focusout', validatecommand=validations.validate_population)
     shared.militiavalue.insert(0,shared.turns[-1].Militia)
     shared.militiavalue.grid(row=2, column=5, sticky="w", padx=5)
+    shared.militiavalue.bind("<Tab>",set_focus_next)
+    shared.militiavalue.bind("<Shift-Tab>",set_focus_prev)
     shared.militiavalue.bind("<KeyPress>", validations.validate_numeric)
 
     startSeasonButton = tk.Button(hud_frame, text="Start Season", command = computeTurn, font=game_font)
@@ -347,7 +379,7 @@ def showMap():
     mountain3d.place(x=920,y=550)
 
 # Animate attack
-def startAttack(v):
+def startAttack(v,callback):
     global map_frame, ball_speed, ball, ball_moving
     match v:
         case 1:
@@ -368,9 +400,9 @@ def startAttack(v):
     ball = map_frame.create_oval(x1, y1, x2, y2, fill='red')
     ball_speed = -3
     ball_moving = True
-    attackAnimate(v)
+    attackAnimate(v,callback)
 
-def attackAnimate(v):
+def attackAnimate(v,callback):
     global map_frame, ball, ball_moving, ball_speed, window
     match v:
         case 1: xlim = 420
@@ -382,10 +414,11 @@ def attackAnimate(v):
     if x >= 780:
         ball_moving = False
         map_frame.delete(ball)
+        callback()
     
     if(ball_moving):
         map_frame.move(ball,ball_speed,0)
-        window.after(20, attackAnimate, v)
+        window.after(20, attackAnimate, v, callback)
 
 # Game variables
 shared.turns = []
@@ -411,8 +444,5 @@ if startGame:
 
     # Render Map
     showMap()
-
-    # TEST ANIMATION
-    startAttack(1)
 
     window.mainloop()
