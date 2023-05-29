@@ -47,7 +47,7 @@ def computeTurn():
         # Flood
         shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,villagesHit,0,0,0,0,0,0)
         shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
-        # TODO - Animate Flooding
+        testFlood(shared.turns[-1].FloodDamage.FloodSize)
         # Attack
         shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
         shared.turns[-1].AttackDamage.Calculate(shared.turns[-1].Season,villagesHit,mi,shared.turns[-1].Food)
@@ -59,7 +59,7 @@ def computeTurn():
         # Flood
         shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,villagesHit,0,0,0,0,0,0)
         shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
-        # TODO - Animate Flooding
+        testFlood(shared.turns[-1].FloodDamage.FloodSize)
     
     #Starvation, Food growing, Population growth
     shared.turns[-1].Calculate()
@@ -419,6 +419,66 @@ def attackAnimate(v,callback):
     if(ball_moving):
         map_frame.move(ball,ball_speed,0)
         window.after(20, attackAnimate, v, callback)
+
+# Calculate next flood movement
+def nextFloodMove(x,y):
+    diceroll = random.randint(1,4)
+    match diceroll:
+        case 1:
+            if(x - 32 < 0):
+                nextFloodMove(x,y)
+            else:
+                x = x - 32
+        case 2:
+            if(x + 32 > 800):
+                nextFloodMove(x,y)
+            else:
+                x = x + 32
+        case 3:
+            if(y - 32 < 0):
+                nextFloodMove(x,y)
+            else:
+                y = y - 32
+        case 4:
+            if(y + 32 > 600):
+                nextFloodMove(x,y)
+            else:
+                y = y + 32
+    return x,y
+
+# Test Flood Movement
+def testFlood(floodsize):
+    if floodsize < 1:
+        return
+    elif floodsize < 2:
+        floodsize = random.randint(1,2)
+    else:
+        floodsize = random.randint(1,4)
+
+    floodX = 150
+    floodY = 50 + random.randint(0,500)
+    print(f"First flood block at {floodX},{floodY}")
+
+    for k in range(0,floodsize * 100):
+        floodX,floodY = nextFloodMove(floodX,floodY)
+        print(f"Next flood block at {floodX},{floodY}")
+        if checkFloodVillage(floodX,floodY):
+            print("VILLAGE HIT BY FLOOD")
+
+# Check if village hit by flood
+def checkFloodVillage(x,y):
+    v1x,v1y = 350,150
+    v2x,v2y = 500,300
+    v3x,v3y = 500,450
+
+    if x+32 > v1x and x < v1x+64 and y+32 > v1y and y < v1y+64:
+        return True  # Village 1 hit
+    elif x+32 > v2x and x < v2x+64 and y+32 > v2y and y < v2y+64:
+        return True  # Village 2 hit
+    elif x+32 > v3x and x < v3x+64 and y+32 > v3y and y < v3y+64:
+        return True  # Village 3 hit
+
+    return False 
 
 # Game variables
 shared.turns = []
