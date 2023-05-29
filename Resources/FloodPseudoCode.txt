@@ -1,0 +1,33 @@
+// Original Code
+ 5560IF FS<1 THEN ENDPROC
+ 5570X=6:ZF=1:Y=RND(8)+10:IF FS<2 THEN FS=RND(2) ELSE FS=RND(4)
+ 5600PRINT TAB(1,Y);W$;W$;W$;W$;W$;W$
+ 5610FOR K=1 TO FS*100
+ 5620ON RND(4) GOTO5630,5640,5650,5660
+ 5630IF X=25 THEN 5620 ELSE X=X+1:GOTO5700
+ 5640IF X=6 THEN 5620 ELSE X=X-1:GOTO5700
+ 5650IF Y=22 THEN 5620 ELSE Y=Y+1:GOTO5700
+ 5660IF Y=3 THEN 5620 ELSE Y=Y-1:GOTO5700
+ 5700V=1
+ 5720W1=VX(V)-X:W2=Y-VY(V)
+ 5730IF W2<>1 AND W2<>0 THEN 5760
+ 5740IF W1=0 OR W1=1 THEN FL(V)=1
+ 5750IF W1=-1 THEN 5780
+ 5760V=V+1:IF V<4 THEN 5720
+ 5770PRINT TAB(X,Y);W$
+ 5780NEXT K
+
+
+// PSUEDO CODE
+// If flood size is < 1 then don't animate it 
+// Set the start coordinates of the flood at the rivers edge for x and random y placement
+// Modify flood size - if less than 2 then rand(2), else rand(4) --- WHY ??? Playabilty ?  Graphics ?
+// Loop from 1 to flood size * 100
+// Switch on rand 4
+// Case 1 - X+1 unless it hit the edge, roll again if so
+// Case 2 - X-1 unless it hit the edge, roll again if so
+// Case 3 - Y+1 unless it hit the edge, roll again if so
+// Case 4 - Y-1 unless it hit the edge, roll again if so
+// Check for collision with village, if so update villages hit count
+// Draw block
+// End Loop 
