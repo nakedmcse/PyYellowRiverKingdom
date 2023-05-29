@@ -50,7 +50,7 @@ def computeTurn():
         # Flood
         shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,0,0,0,0,0,0,0)
         shared.turns[-1].FloodDamage.SetSize(dw,shared.turns[-1].Season)
-        villagesHit = testFlood(shared.turns[-1].FloodDamage.FloodSize)
+        villagesHit = drawFlood(shared.turns[-1].FloodDamage.FloodSize)
         shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season,villagesHit)
         # Attack
         shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
@@ -63,7 +63,7 @@ def computeTurn():
         # Flood
         shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,0,0,0,0,0,0,0)
         shared.turns[-1].FloodDamage.SetSize(dw,shared.turns[-1].Season)
-        villagesHit = testFlood(shared.turns[-1].FloodDamage.FloodSize)
+        villagesHit = drawFlood(shared.turns[-1].FloodDamage.FloodSize)
         shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season,villagesHit)
     
     #Starvation, Food growing, Population growth
@@ -139,6 +139,10 @@ def computeReport():
         shared.growingvalue.config(state="disabled")
     else:
         shared.growingvalue.config(state="normal")
+
+    # Redraw map
+    map_frame.destroy()
+    showMap()
 
 # Show Splash Window
 def showSplashWindow():
@@ -451,8 +455,9 @@ def nextFloodMove(x,y):
                 y = y + 32
     return x,y
 
-# Test Flood Movement
-def testFlood(floodsize):
+# Draw Flood Movement
+def drawFlood(floodsize):
+    global map_frame
     if floodsize < 1:
         return 0
     elif floodsize < 2:
@@ -462,13 +467,12 @@ def testFlood(floodsize):
     villages_flooded = 0
     floodX = 150
     floodY = 50 + random.randint(0,500)
-    print(f"First flood block at {floodX},{floodY}")
+    map_frame.create_rectangle(floodX, floodY, floodX+32, floodY+32, outline="", fill='#50a4ac')
 
     for k in range(0,floodsize * 100):
         floodX,floodY = nextFloodMove(floodX,floodY)
-        print(f"Next flood block at {floodX},{floodY}")
+        map_frame.create_rectangle(floodX, floodY, floodX+32, floodY+32, outline="", fill='#50a4ac')
         if checkFloodVillage(floodX,floodY):
-            print("VILLAGE HIT BY FLOOD")
             villages_flooded = villages_flooded + 1
     
     return villages_flooded
