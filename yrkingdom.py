@@ -9,7 +9,7 @@ from tkinter import font, messagebox, Label, PhotoImage, Text
 
 # Compute Turn Procedure
 def computeTurn():
-    global villagesHit
+    global villagesHit,v1hit,v2hit,v3hit
     # Get values
     fw = int(shared.fieldWorkersvalue.get())
     dw = int(shared.dykeWorkersvalue.get())
@@ -42,12 +42,16 @@ def computeTurn():
     shared.growingvalue.config(state="disabled")
     
     # Attacks, Floods
-    villagesHit = random.randint(0,3)
+    villagesHit = 0  # placeholder for no floods
+    v1hit = False  # reset flood collision detection
+    v2hit = False
+    v3hit = False
     if random.randint(0,2) == 1:
         # Flood
-        shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,villagesHit,0,0,0,0,0,0)
-        shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
-        testFlood(shared.turns[-1].FloodDamage.FloodSize)
+        shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,0,0,0,0,0,0,0)
+        shared.turns[-1].FloodDamage.SetSize(dw,shared.turns[-1].Season)
+        villagesHit = testFlood(shared.turns[-1].FloodDamage.FloodSize)
+        shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season,villagesHit)
         # Attack
         shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
         shared.turns[-1].AttackDamage.Calculate(shared.turns[-1].Season,villagesHit,mi,shared.turns[-1].Food)
@@ -57,9 +61,10 @@ def computeTurn():
         shared.turns[-1].AttackDamage = gameobjects.AttackDamage(shared.turns[-1].Season,0,0)
         shared.turns[-1].AttackDamage.Calculate(shared.turns[-1].Season,villagesHit,mi,shared.turns[-1].Food)
         # Flood
-        shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,villagesHit,0,0,0,0,0,0)
-        shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season)
-        testFlood(shared.turns[-1].FloodDamage.FloodSize)
+        shared.turns[-1].FloodDamage = gameobjects.FloodDamage(shared.turns[-1].Season,0,0,0,0,0,0,0)
+        shared.turns[-1].FloodDamage.SetSize(dw,shared.turns[-1].Season)
+        villagesHit = testFlood(shared.turns[-1].FloodDamage.FloodSize)
+        shared.turns[-1].FloodDamage.Calculate(dw,fw,mi,shared.turns[-1].Food,shared.turns[-1].Season,villagesHit)
     
     #Starvation, Food growing, Population growth
     shared.turns[-1].Calculate()
@@ -449,12 +454,12 @@ def nextFloodMove(x,y):
 # Test Flood Movement
 def testFlood(floodsize):
     if floodsize < 1:
-        return
+        return 0
     elif floodsize < 2:
         floodsize = random.randint(1,2)
     else:
         floodsize = random.randint(1,4)
-
+    villages_flooded = 0
     floodX = 150
     floodY = 50 + random.randint(0,500)
     print(f"First flood block at {floodX},{floodY}")
@@ -464,18 +469,25 @@ def testFlood(floodsize):
         print(f"Next flood block at {floodX},{floodY}")
         if checkFloodVillage(floodX,floodY):
             print("VILLAGE HIT BY FLOOD")
+            villages_flooded = villages_flooded + 1
+    
+    return villages_flooded
 
 # Check if village hit by flood
 def checkFloodVillage(x,y):
+    global v1hit,v2hit,v3hit
     v1x,v1y = 350,150
     v2x,v2y = 500,300
     v3x,v3y = 500,450
 
-    if x+32 > v1x and x < v1x+64 and y+32 > v1y and y < v1y+64:
+    if x+32 > v1x and x < v1x+64 and y+32 > v1y and y < v1y+64 and v1hit == False:
+        v1hit = True
         return True  # Village 1 hit
-    elif x+32 > v2x and x < v2x+64 and y+32 > v2y and y < v2y+64:
+    elif x+32 > v2x and x < v2x+64 and y+32 > v2y and y < v2y+64 and v2hit == False:
+        v2hit = True
         return True  # Village 2 hit
-    elif x+32 > v3x and x < v3x+64 and y+32 > v3y and y < v3y+64:
+    elif x+32 > v3x and x < v3x+64 and y+32 > v3y and y < v3y+64 and v3hit == False:
+        v3hit = True
         return True  # Village 3 hit
 
     return False 

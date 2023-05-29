@@ -98,8 +98,8 @@ class FloodDamage:
         self.FoodLost = ff
         self.PopulationLost = fd
         self.PlantedFoodMultiplier = g
-    
-    def Calculate(self,dw,fw,m,f,s):
+
+    def SetSize(self,dw,s):
         #Size of flood by Season
         if s == "growing":
             self.FloodSize = (random.randint(0,330)/(dw + 1))
@@ -114,8 +114,12 @@ class FloodDamage:
             self.FoodLost = 0
             self.PlantedFoodMultiplier = 1
             self.PopulationLost = 0 
+
+    def Calculate(self,dw,fw,m,f,s,v):
+        #No Flood then return
+        if self.FloodSize == 0:
             return
-        
+        self.VillagesHit = v
         #Population Damage
         self.DykeWorkersKilled = (dw // 10)*(10 - self.FloodSize)
         self.FieldWorkersKilled = (fw // 10)*(10 - self.FloodSize)
