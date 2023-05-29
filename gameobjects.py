@@ -167,6 +167,8 @@ class AttackDamage:
         
         # Militia Killed
         self.MilitiaKilled = int(round((m * (baseDamage/400))))
+        if self.MilitiaKilled < 0:
+            self.MilitiaKilled = 0
         # Food Lost
         self.FoodLost = int(round((baseDamage * (f/729) + random.randint(0,2000-m)/10)))
         if self.FoodLost < 0:
