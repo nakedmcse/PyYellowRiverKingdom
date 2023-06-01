@@ -6,6 +6,8 @@ import random
 import time
 import tkinter as tk
 from tkinter import font, messagebox, Label, PhotoImage, Text
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 # Compute Turn Procedure
 def computeTurn():
@@ -341,15 +343,31 @@ def showHUD():
 def showHistory():
     historyWindow = tk.Tk()
     historyWindow.title("History")
-    historyWindow.geometry("600x350")
+    historyWindow.geometry("600x450")
 
-    #canvas
-    history_frame = tk.Canvas(historyWindow, border=0, width=580, height = 280, background="#ece6dc")
-    history_frame.pack(padx=10, pady=10, fill="x", side="top")
+    # Get data ranges
+    food_range = [turn.StartingFood for turn in shared.turns]
+    pop_range = [turn.StartingPopulation for turn in shared.turns]
+    labels = [f'S{i+1}' for i in range(len(pop_range))]
 
-    #exit button
+    # Create stacked bar graph
+    figure = Figure(figsize=(5,4), dpi=100)
+    subplot = figure.add_subplot(111)
+    subplot.bar(labels, food_range, label='Food')
+    subplot.bar(labels, pop_range, label='Population')
+    subplot.set_xlabel('Seasons')
+    subplot.set_ylabel('Values')
+    subplot.legend()
+
+    # Exit button
     history_exit_button = tk.Button(historyWindow, text="Exit", command=historyWindow.destroy)
-    history_exit_button.pack(side="top")
+    history_exit_button.pack(side="bottom")
+
+    # Canvas
+    #history_frame = tk.Canvas(historyWindow, border=0, width=580, height = 280, background="#ece6dc")
+    history_frame = FigureCanvasTkAgg(figure, master=historyWindow)
+    history_frame.draw()
+    history_frame.get_tk_widget().pack(padx=5, pady=5, fill="both", expand=True)
 
 # Show Map
 def showMap():
