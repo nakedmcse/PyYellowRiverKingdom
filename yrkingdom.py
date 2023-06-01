@@ -254,6 +254,7 @@ def set_focus_prev(event):
 def showHUD():
     global window
     global startSeasonButton
+    global historyButton
     global seasonvalue
     global yearvalue
     global populationvalue
@@ -325,7 +326,9 @@ def showHUD():
     shared.militiavalue.bind("<KeyPress>", validations.validate_numeric)
 
     startSeasonButton = tk.Button(hud_frame, text="Start Season", command = computeTurn, font=game_font)
-    startSeasonButton.grid(row=3, column=2, columnspan=2)
+    startSeasonButton.grid(row=3, column=1, columnspan=2)
+    historyButton = tk.Button(hud_frame, text="Show History", command = showHistory, font=game_font)
+    historyButton.grid(row=3, column=3, columnspan=2)
 
     hud_frame.grid_columnconfigure(0,weight=1)
     hud_frame.grid_columnconfigure(1,weight=1)
@@ -333,6 +336,20 @@ def showHUD():
     hud_frame.grid_columnconfigure(3,weight=1)
     hud_frame.grid_columnconfigure(4,weight=1)
     hud_frame.grid_columnconfigure(5,weight=1)
+
+# Show History Window
+def showHistory():
+    historyWindow = tk.Tk()
+    historyWindow.title("History")
+    historyWindow.geometry("600x350")
+
+    #canvas
+    history_frame = tk.Canvas(historyWindow, border=0, width=580, height = 280, background="#ece6dc")
+    history_frame.pack(padx=10, pady=10, fill="x", side="top")
+
+    #exit button
+    history_exit_button = tk.Button(historyWindow, text="Exit", command=historyWindow.destroy)
+    history_exit_button.pack(side="top")
 
 # Show Map
 def showMap():
